@@ -1,22 +1,19 @@
-# 一键部署：构建镜像并启动（前后端同端口 8001，见 deploy.ps1 / deploy.sh）
+# 生产：Nginx 监听 80 → 反向代理 app:8001（应用不直接暴露宿主机端口）
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
     image: pridection-price:latest
-    container_name: pridection-price
-    ports:
-      - "8001:8001"
-    # 若不存在 .env，运行 deploy.ps1 / deploy.sh 会从 .env.example 复制
+    container_name: pridection-price-app
+    # 不映射到宿主机；仅内网供 nginx 访问
+    expose:
+      - "8001"
     env_file:
       - .env
     environment:
-      # 覆盖默认 PDF 路径时可用（容器内路径）
-      # PDF_PATH: /app/docs/2025年1-12月电费核查联.pdf
       TZ: Asia/Shanghai
     volumes:
-      # 持久化数据与模型；本地目录挂载到容器
       - ./data:/app/data
       - ./models:/app/models
       - ./docs:/app/docs:ro
@@ -32,4 +29,16 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 20s
+      start_period: 25s
+
+  nginx:
+    image: nginx:alpine
+    container_name: pridection-price-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped

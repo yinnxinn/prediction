@@ -1,0 +1,6 @@
+# 可选：复制为 docker-compose.override.yml，在宿主机本机回环暴露 8001 便于直连调试 API
+# cp deploy/docker-compose.override.example.yml docker-compose.override.yml
+services:
+  app:
+    ports:
+      - "127.0.0.1:8001:8001"

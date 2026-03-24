@@ -12,11 +12,15 @@ if [[ ! -f .env ]]; then
   cp -f .env.example .env
 fi
 
-echo "[deploy] 构建镜像并启动容器（端口 8001）..."
+echo "[deploy] 构建并启动（Nginx 80 → app:8001）..."
 if docker compose version >/dev/null 2>&1; then
   docker compose up -d --build
 else
   docker-compose up -d --build
 fi
 
-echo "[deploy] 完成。访问 http://127.0.0.1:8001/ （API 文档见 /docs）"
+echo "[deploy] 完成。"
+echo "  http://<服务器IP>/          页面与 API"
+echo "  http://<服务器IP>/docs      Swagger"
+echo "  查看日志: docker compose logs -f app"
+echo "  查看 Nginx: docker compose logs -f nginx"

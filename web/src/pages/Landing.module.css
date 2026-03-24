@@ -156,6 +156,13 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
 }
 
+.roleCardWide {
+  grid-column: 1 / -1;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .roleCardInner {
   background: linear-gradient(165deg, rgba(17, 24, 48, 0.98) 0%, rgba(10, 14, 28, 0.99) 100%);
   border-radius: 15px;
@@ -235,6 +242,16 @@
   font-size: 13px;
   color: var(--muted);
   line-height: 1.6;
+}
+
+.roleTech {
+  margin: 0 0 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--agent-accent) 75%, #c4c9e8);
+  font-family: var(--mono);
+  opacity: 0.92;
 }
 
 @keyframes roleCardIn {

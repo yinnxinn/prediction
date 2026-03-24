@@ -66,6 +66,17 @@
   stroke-width: 1.5;
 }
 
+.nodeRectMerged {
+  fill: rgba(167, 139, 250, 0.1);
+  stroke: rgba(129, 140, 248, 0.55);
+  stroke-width: 1.5;
+}
+
+.nodeSubWide {
+  fill: #8b96b8;
+  font-size: 11px;
+}
+
 .nodeId {
   fill: #e8ecff;
   font-size: 15px;

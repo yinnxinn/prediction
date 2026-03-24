@@ -61,14 +61,22 @@ npm run dev
 
 生产：在 `web` 目录执行 `npm run build` 后，静态资源输出到 `web/dist`。启动 FastAPI 后访问 `http://127.0.0.1:8001/` 即加载 React 构建产物（若已构建）；未构建时回退到 `templates/index.html`（若存在）。
 
-### Docker 一键部署
+### Docker 一键部署（Nginx 对外 **80**）
 
-前置：安装 Docker Desktop 或 Docker Engine + Compose。项目根目录执行：
+前置：安装 Docker Desktop 或 Docker Engine + Compose；**Linux 服务器**需放行防火墙 **80/TCP**（如 `firewall-cmd --add-port=80/tcp --permanent && firewall-cmd --reload` 或云安全组）。
+
+项目根目录执行：
 
 - **Windows**：`.\deploy.ps1`（若提示执行策略，可用 `powershell -ExecutionPolicy Bypass -File .\deploy.ps1`）
 - **Linux / macOS**：`chmod +x deploy.sh && ./deploy.sh`（或 `make deploy`）
 
-脚本会在缺少 `.env` 时从 `.env.example` 复制一份；镜像内会执行 `web` 的 `npm run build`，与 FastAPI 同端口 **8001** 提供页面与 API。`data/`、`models/`、`docs/` 通过卷挂载，便于持久化与替换 PDF。停止：`docker compose down`；查看日志：`docker compose logs -f app` 或 `make logs`。
+行为说明：
+
+- 构建镜像并在容器内执行 `web` 的 `npm run build`；**FastAPI 仅监听容器内 8001**，不直接映射到宿主机。
+- **Nginx**（`nginx:alpine`）将宿主机 **80** 端口反向代理到 `app:8001`，配置文件见 `deploy/nginx/default.conf`。
+- 部署后访问：`http://<服务器IP>/`（页面与 API 同域）、`http://<服务器IP>/docs`（Swagger）。`data/`、`models/`、`docs/` 仍通过卷挂载。
+
+常用命令：`docker compose down` 停止；`docker compose logs -f app` / `make logs-nginx` 查看日志。若需在宿主机本机调试直连后端，可将 `deploy/docker-compose.override.example.yml` 复制为 `docker-compose.override.yml` 以额外映射 `127.0.0.1:8001`。
 
 ## 3. 推荐调用顺序
 

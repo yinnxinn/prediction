@@ -16,11 +16,15 @@ if (-not (Test-Path .env)) {
     Copy-Item -Force .env.example .env
 }
 
-Write-Host "[deploy] 构建镜像并启动容器（端口 8001）..." -ForegroundColor Cyan
+Write-Host "[deploy] 构建并启动（Nginx 80 → app:8001）..." -ForegroundColor Cyan
 docker compose up -d --build
 if ($LASTEXITCODE -ne 0) {
     docker-compose up -d --build
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
-Write-Host "[deploy] 完成。访问 http://127.0.0.1:8001/  （API 文档见 /docs）" -ForegroundColor Green
+Write-Host "[deploy] 完成。" -ForegroundColor Green
+Write-Host "  http://<服务器IP>/          页面与 API"
+Write-Host "  http://<服务器IP>/docs      Swagger"
+Write-Host "  日志: docker compose logs -f app"
+Write-Host "  Nginx: docker compose logs -f nginx"
