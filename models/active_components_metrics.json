@@ -1,0 +1,22 @@
+{
+  "peak2_kwh": {
+    "mae": 0.0,
+    "rmse": 0.0
+  },
+  "peak_kwh": {
+    "mae": 0.0,
+    "rmse": 0.0
+  },
+  "flat_kwh": {
+    "mae": 40010.8,
+    "rmse": 40010.8
+  },
+  "valley_kwh": {
+    "mae": 99199.0,
+    "rmse": 99199.0
+  },
+  "deep_valley_kwh": {
+    "mae": 1810.4,
+    "rmse": 1810.4
+  }
+}

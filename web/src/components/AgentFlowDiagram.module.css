@@ -1,0 +1,104 @@
+.wrap {
+  margin: 8px 0 28px;
+  padding: 20px 12px 16px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(15, 23, 41, 0.95) 0%, rgba(8, 12, 28, 0.98) 100%);
+  border: 1px solid rgba(79, 124, 255, 0.22);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03) inset, 0 24px 48px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(79, 124, 255, 0.12), transparent 55%);
+  pointer-events: none;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  min-height: 160px;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.flowPath,
+.flowPathFork {
+  stroke-dasharray: 8 6;
+  animation: flowDash 22s linear infinite;
+}
+
+@keyframes flowDash {
+  to {
+    stroke-dashoffset: -280;
+  }
+}
+
+.arrowHead {
+  opacity: 0.9;
+}
+
+.nodeRect {
+  fill: rgba(79, 124, 255, 0.12);
+  stroke: rgba(129, 140, 248, 0.55);
+  stroke-width: 1.5;
+}
+
+.nodeRectAccent {
+  fill: rgba(34, 211, 166, 0.1);
+  stroke: rgba(45, 212, 191, 0.55);
+  stroke-width: 1.5;
+}
+
+.nodeRectParallel {
+  fill: rgba(244, 114, 182, 0.08);
+  stroke: rgba(167, 139, 250, 0.5);
+  stroke-width: 1.5;
+}
+
+.nodeRectParallelAlt {
+  fill: rgba(244, 114, 182, 0.06);
+  stroke: rgba(244, 114, 182, 0.45);
+  stroke-width: 1.5;
+}
+
+.nodeId {
+  fill: #e8ecff;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--mono, ui-monospace, monospace);
+}
+
+.nodeSub {
+  fill: #8b96b8;
+  font-size: 11px;
+}
+
+.forkLabel {
+  fill: rgba(167, 139, 250, 0.95);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.caption {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted, #8b96b8);
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 520px) {
+  .wrap {
+    padding: 14px 6px 12px;
+  }
+  .svg {
+    min-height: 200px;
+  }
+}

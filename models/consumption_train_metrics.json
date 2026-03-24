@@ -1,0 +1,9 @@
+{
+  "mae": 780.6666666666861,
+  "rmse": 927.0601083233356,
+  "mape": 0.00798074900063138,
+  "train_rows": 5,
+  "test_rows": 2,
+  "dataset_path": "D:\\projects\\2026\\pridection_price\\data\\processed\\electricity_price_monthly.csv",
+  "trained_at": "2026-03-16T17:03:23.363109"
+}

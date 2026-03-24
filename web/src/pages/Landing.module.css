@@ -1,0 +1,261 @@
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  border: 1px solid rgba(34, 211, 166, 0.35);
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 16px;
+  letter-spacing: -0.02em;
+}
+
+.hl {
+  background: linear-gradient(90deg, #7dd3fc, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lead {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 640px;
+  margin: 0 auto 28px;
+}
+
+.lead strong {
+  color: var(--text);
+}
+
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.section {
+  margin-bottom: 48px;
+}
+
+.h2 {
+  font-size: 22px;
+  margin: 0 0 16px;
+  color: #c9d4ff;
+}
+
+.p {
+  color: var(--muted);
+  margin: 0 0 16px;
+  font-size: 15px;
+}
+
+.p strong {
+  color: var(--text);
+}
+
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flowItem {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.flowNum {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(79, 124, 255, 0.2);
+  color: #93c5fd;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.flowLabel {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.flowText {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.agentHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 20px;
+  margin-bottom: 8px;
+}
+
+.agentTagline {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(167, 139, 250, 0.85);
+  font-weight: 600;
+}
+
+.agentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.roleCard {
+  position: relative;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--agent-accent) 55%, transparent),
+    rgba(30, 42, 74, 0.4)
+  );
+  animation: roleCardIn 0.55s ease backwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.roleCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.roleCardInner {
+  background: linear-gradient(165deg, rgba(17, 24, 48, 0.98) 0%, rgba(10, 14, 28, 0.99) 100%);
+  border-radius: 15px;
+  padding: 18px 18px 20px;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.roleCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.iconOrb {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    circle at 30% 25%,
+    color-mix(in srgb, var(--agent-accent) 45%, transparent),
+    rgba(15, 23, 41, 0.95)
+  );
+  box-shadow: 0 0 24px color-mix(in srgb, var(--agent-accent) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: var(--agent-accent);
+}
+
+.iconSvg {
+  display: block;
+}
+
+.roleTitles {
+  min-width: 0;
+}
+
+.roleId {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--agent-accent);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.roleName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.rolePipe {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--mono);
+  color: color-mix(in srgb, var(--agent-accent) 90%, #fff);
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--agent-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--agent-accent) 28%, transparent);
+  margin-bottom: 12px;
+}
+
+.roleDetail {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@keyframes roleCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--muted);
+}

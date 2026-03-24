@@ -1,0 +1,21 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.py[cod]
+*$py.class
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.cursor
+*.md
+!README.md
+
+web/node_modules
+web/dist
+
+# 本地构建产物与日志
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>用电量与有功示数差预测看板</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: #121933;
+        --text: #e7ecff;
+        --sub: #aeb8de;
+        --ok: #37d67a;
+        --warn: #ffb020;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: linear-gradient(180deg, #070b17 0%, #0b1020 100%);
+        color: var(--text);
+      }
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+      .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .title { font-size: 24px; font-weight: 700; margin: 0; }
+      .sub { color: var(--sub); margin-top: 6px; font-size: 14px; }
+      .btns { display: flex; gap: 10px; }
+      button {
+        border: none;
+        background: #2d5bff;
+        color: white;
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button.secondary { background: #33406d; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid #2a345d;
+        border-radius: 12px;
+        padding: 16px;
+      }
+      .label { color: var(--sub); font-size: 13px; }
+      .value { font-size: 24px; font-weight: 700; margin-top: 8px; }
+      .tiny { color: var(--sub); font-size: 12px; margin-top: 8px; }
+      #chart { height: 380px; background: var(--panel); border: 1px solid #2a345d; border-radius: 12px; padding: 8px; margin-bottom: 16px; }
+      .reasons { background: var(--panel); border: 1px solid #2a345d; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+      .reasons h3 { margin: 0 0 12px; font-size: 16px; }
+      .reasons .month { margin-bottom: 16px; }
+      .reasons .month-title { font-weight: 600; margin-bottom: 8px; color: #c9d4ff; }
+      .reasons .item-block { margin-bottom: 12px; padding: 10px; background: #0d1222; border-radius: 8px; }
+      .reasons .item-name { font-weight: 600; color: #7dd3fc; margin-bottom: 6px; }
+      .reasons .reason { font-size: 13px; color: var(--sub); margin: 4px 0; padding-left: 8px; border-left: 2px solid #2d5bff; }
+      .reasons .reason.summary { color: #7dd3fc; font-weight: 600; border-left-color: #37d67a; }
+      .status { margin-top: 12px; color: var(--sub); font-size: 13px; }
+      .status.ok { color: var(--ok); }
+      .status.warn { color: var(--warn); }
+      .section-title { font-size: 18px; font-weight: 600; margin: 24px 0 12px; color: #c9d4ff; border-bottom: 1px solid #2a345d; padding-bottom: 8px; }
+      .reading-diff-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+      .reading-diff-card { background: #0d1222; border: 1px solid #2a345d; border-radius: 8px; padding: 12px; }
+      .reading-diff-card .name { color: #7dd3fc; font-weight: 600; font-size: 14px; }
+      .reading-diff-card .current { font-size: 18px; margin: 6px 0 2px; }
+      .reading-diff-card .pred { font-size: 13px; color: var(--ok); }
+      @media (max-width: 900px) {
+        .grid { grid-template-columns: 1fr; }
+        #chart { height: 320px; }
+        .reading-diff-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <h1 class="title">用电量与有功示数差预测看板</h1>
+          <div class="sub">展示用电量预测、有功示数差及各项预测理由（不含电价）</div>
+        </div>
+        <div class="btns">
+          <button class="secondary" id="btn-refresh-data">刷新数据</button>
+          <button id="btn-rerun">重新解析并预测</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="label">最新用电量</div>
+          <div class="value" id="realtime-kwh">-</div>
+          <div class="tiny" id="realtime-time">-</div>
+        </div>
+        <div class="card">
+          <div class="label">下期预测用电量</div>
+          <div class="value" id="next-kwh">-</div>
+          <div class="tiny" id="next-time">-</div>
+        </div>
+        <div class="card">
+          <div class="label">状态</div>
+          <div class="value" id="status-text" style="font-size: 18px;">加载中</div>
+          <div class="tiny" id="status-detail">-</div>
+        </div>
+      </div>
+
+      <div id="chart"></div>
+
+      <div class="section-title">有功示数差分项预测</div>
+      <div class="btns" style="margin-bottom:12px">
+        <button class="secondary" id="btn-train-reading-diff">训练示数差模型</button>
+        <button class="secondary" id="btn-refresh-reading-diff">刷新示数差</button>
+      </div>
+      <div class="reading-diff-grid" id="reading-diff-cards">加载中...</div>
+      <div id="chart-reading-diff" style="height:320px;background:var(--panel);border:1px solid #2a345d;border-radius:12px;padding:8px;margin:16px 0"></div>
+      <div class="reasons" id="reading-diff-reasons">
+        <h3>示数差预测理由</h3>
+        <div id="reading-diff-reasons-content">-</div>
+      </div>
+
+      <div class="section-title">用电量预测理由</div>
+      <div class="reasons" id="reasons-panel">
+        <h3>预测理由（用电量）</h3>
+        <div id="reasons-content">加载中...</div>
+      </div>
+      <div id="status" class="status">初始化中...</div>
+    </div>
+
+    <script>
+      const chart = echarts.init(document.getElementById("chart"));
+
+      function fmtKwh(n) {
+        if (n === null || n === undefined || Number.isNaN(Number(n))) return "-";
+        return Number(n).toLocaleString("zh-CN", { maximumFractionDigits: 0 }) + " kWh";
+      }
+      function fmtDate(iso) {
+        if (!iso) return "-";
+        return new Date(iso).toLocaleString("zh-CN", { hour12: false });
+      }
+      function fmtReadingDiff(n) {
+        if (n === null || n === undefined || Number.isNaN(Number(n))) return "-";
+        return Number(n).toFixed(4);
+      }
+
+      function setStatus(msg, kind = "ok") {
+        const el = document.getElementById("status");
+        el.className = "status " + (kind === "ok" ? "ok" : "warn");
+        el.textContent = msg;
+      }
+
+      function renderReasons(itemized) {
+        const el = document.getElementById("reasons-content");
+        if (!itemized || !itemized.predictions || !itemized.predictions.length) {
+          el.innerHTML = "<div class='tiny'>暂无预测理由数据</div>";
+          return;
+        }
+        let html = "";
+        for (const p of itemized.predictions) {
+          const ts = p.timestamp ? p.timestamp.slice(0, 7) : "-";
+          html += "<div class='month'><div class='month-title'>" + ts + "</div>";
+          for (const it of p.items || []) {
+            if (it.item === "电价" || it.item === "电费") continue;
+            const pred = it.unit === "kWh" ? fmtKwh(it.prediction) : String(it.prediction);
+            html += "<div class='item-block'><div class='item-name'>" + it.item + "： " + pred + "</div>";
+            if (it.summary) html += "<div class='reason summary'>" + it.summary + "</div>";
+            for (const r of it.reasons || []) {
+              html += "<div class='reason'>" + (r.description || r.factor) + "</div>";
+            }
+            html += "</div>";
+          }
+          html += "</div>";
+        }
+        el.innerHTML = html || "<div class='tiny'>暂无预测理由</div>";
+      }
+
+      async function loadReadingDiffOverview() {
+        const res = await fetch("/ui/reading-diff-overview?months=3");
+        if (!res.ok) {
+          document.getElementById("reading-diff-cards").innerHTML = "<span class='tiny'>示数差数据未就绪，请先运行 parse_active_readings 解析 PDF</span>";
+          document.getElementById("chart-reading-diff").style.display = "none";
+          document.getElementById("reading-diff-reasons-content").innerHTML = "-";
+          return;
+        }
+        const data = await res.json();
+        const names = data.component_names || {};
+        const lastHist = data.history && data.history.length ? data.history[data.history.length - 1] : null;
+        const firstPred = data.predictions && data.predictions.length ? data.predictions[0] : null;
+
+        let cardsHtml = "";
+        const comps = ["peak2_reading_diff","peak_reading_diff","flat_reading_diff","valley_reading_diff","deep_valley_reading_diff"];
+        for (const col of comps) {
+          const name = names[col] || col;
+          const cur = lastHist?.components?.[col];
+          const pred = firstPred?.components?.[col];
+          cardsHtml += "<div class='reading-diff-card'><div class='name'>" + name + "</div>";
+          cardsHtml += "<div class='current'>最新: " + fmtReadingDiff(cur) + "</div>";
+          cardsHtml += "<div class='pred'>预测: " + fmtReadingDiff(pred) + "</div></div>";
+        }
+        document.getElementById("reading-diff-cards").innerHTML = cardsHtml;
+
+        const chartRd = echarts.init(document.getElementById("chart-reading-diff"));
+        const histX = (data.history || []).map(h => h.timestamp?.slice(0,7) || "");
+        const predX = (data.predictions || []).map(p => p.timestamp?.slice(0,7) || "");
+        const allX = histX.concat(predX);
+        const series = [];
+        for (const col of comps) {
+          if (!names[col]) continue;
+          const histV = (data.history || []).map(h => h.components?.[col] ?? null);
+          const predV = (data.predictions || []).map(p => p.components?.[col] ?? null);
+          const histPad = histV.concat(new Array(predV.length).fill(null));
+          const predPad = new Array(histV.length - 1).fill(null).concat(histV.length ? [histV[histV.length-1]] : []).concat(predV);
+          series.push({ name: names[col] + "(历史)", type: "line", data: histPad, smooth: true });
+          series.push({ name: names[col] + "(预测)", type: "line", data: predPad, smooth: true, lineStyle: { type: "dashed" } });
+        }
+        chartRd.setOption({
+          backgroundColor: "transparent",
+          tooltip: { trigger: "axis" },
+          legend: { top: 6, textStyle: { color: "#c9d4ff" } },
+          grid: { left: 40, right: 40, top: 40, bottom: 40 },
+          xAxis: { type: "category", data: allX, axisLabel: { color: "#aeb8de" } },
+          yAxis: { type: "value", name: "示数差", axisLabel: { color: "#aeb8de" }, splitLine: { lineStyle: { color: "#2a345d" } } },
+          series: series
+        });
+        window._chartReadingDiff = chartRd;
+
+        let reasonsHtml = "";
+        if (data.predictions && data.predictions.length) {
+          for (const p of data.predictions) {
+            reasonsHtml += "<div class='month'><div class='month-title'>" + (p.timestamp?.slice(0,7) || "-") + "</div>";
+            for (const [col, reason] of Object.entries(p.reasons || {})) {
+              reasonsHtml += "<div class='item-block'><div class='item-name'>" + (names[col] || col) + "</div><div class='reason'>" + reason + "</div></div>";
+            }
+            reasonsHtml += "</div>";
+          }
+        } else {
+          reasonsHtml = "<div class='tiny'>暂无预测理由</div>";
+        }
+        document.getElementById("reading-diff-reasons-content").innerHTML = reasonsHtml;
+      }
+
+      async function loadOverview() {
+        setStatus("正在加载看板数据...", "ok");
+        const res = await fetch("/ui/price-overview?months=3");
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "加载失败");
+        }
+        const data = await res.json();
+
+        document.getElementById("realtime-kwh").textContent = fmtKwh(data.realtime?.total_kwh);
+        document.getElementById("realtime-time").textContent = fmtDate(data.realtime?.timestamp);
+
+        const np = data.next_prediction;
+        document.getElementById("next-kwh").textContent = fmtKwh(np?.total_kwh);
+        document.getElementById("next-time").textContent = fmtDate(np?.timestamp);
+
+        document.getElementById("status-text").textContent =
+          data.prediction_status === "ok" ? "预测正常" : "预测降级";
+        document.getElementById("status-detail").textContent =
+          data.prediction_error ? data.prediction_error : "模型已可用";
+
+        renderReasons(data.itemized);
+
+        const historyX = data.history.map((x) => x.timestamp.slice(0, 10));
+        const historyKwh = data.history.map((x) => x.total_kwh);
+        const forecastX = (data.forecast || []).map((x) => x.timestamp.slice(0, 10));
+        const forecastKwh = (data.forecast || []).map((x) => x.total_kwh);
+        const allX = historyX.concat(forecastX);
+        const histKwhPad = historyKwh.concat(new Array(forecastKwh.length).fill(null));
+        const foreKwhPad = new Array(historyKwh.length - 1).fill(null)
+          .concat(historyKwh.length ? [historyKwh[historyKwh.length - 1]] : [])
+          .concat(forecastKwh);
+
+        chart.setOption({
+          backgroundColor: "transparent",
+          tooltip: { trigger: "axis" },
+          legend: { top: 6, textStyle: { color: "#c9d4ff" } },
+          grid: { left: 40, right: 50, top: 40, bottom: 40 },
+          xAxis: { type: "category", data: allX, axisLabel: { color: "#aeb8de" } },
+          yAxis: [
+            { type: "value", name: "kWh", position: "left", axisLabel: { color: "#aeb8de" }, splitLine: { lineStyle: { color: "#2a345d" } } }
+          ],
+          series: [
+            { name: "实时/历史用电量", type: "line", data: histKwhPad, smooth: true, lineStyle: { width: 3 }, yAxisIndex: 0 },
+            { name: "预测用电量", type: "line", data: foreKwhPad, smooth: true, lineStyle: { width: 3, type: "dashed" }, yAxisIndex: 0 }
+          ]
+        });
+
+        setStatus("看板加载完成", "ok");
+      }
+
+      async function refreshAll() {
+        await loadOverview().catch(() => {});
+        await loadReadingDiffOverview();
+      }
+
+      async function trainReadingDiff() {
+        setStatus("正在训练示数差模型...", "warn");
+        const res = await fetch("/reading-diff/train", { method: "POST" });
+        if (!res.ok) throw new Error(await res.text());
+        await loadReadingDiffOverview();
+        setStatus("示数差模型训练完成", "ok");
+      }
+
+      async function rerunWorkflow() {
+        setStatus("正在重新解析 PDF 并刷新预测，可能需要 1-4 分钟...", "warn");
+        const res = await fetch("/workflow/run?page_limit=38&months=3", { method: "POST" });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "工作流执行失败");
+        }
+        await loadOverview();
+        setStatus("已完成重新解析和预测", "ok");
+      }
+
+      document.getElementById("btn-refresh-data").addEventListener("click", async () => {
+        try { await refreshAll(); } catch (e) { setStatus("刷新失败: " + e.message, "warn"); }
+      });
+      document.getElementById("btn-train-reading-diff").addEventListener("click", async () => {
+        try { await trainReadingDiff(); } catch (e) { setStatus("训练失败: " + e.message, "warn"); }
+      });
+      document.getElementById("btn-refresh-reading-diff").addEventListener("click", async () => {
+        try { await loadReadingDiffOverview(); setStatus("示数差已刷新", "ok"); } catch (e) { setStatus("刷新失败: " + e.message, "warn"); }
+      });
+
+      document.getElementById("btn-rerun").addEventListener("click", async () => {
+        try { await rerunWorkflow(); } catch (e) { setStatus("重跑失败: " + e.message, "warn"); }
+      });
+
+      (async function init() {
+        try { await loadOverview(); } catch (e) { setStatus("用电量看板: " + e.message, "warn"); }
+        await loadReadingDiffOverview();
+      })();
+      window.addEventListener("resize", () => { chart.resize(); if (window._chartReadingDiff) window._chartReadingDiff.resize(); });
+    </script>
+  </body>
+</html>
