@@ -78,6 +78,8 @@ npm run dev
 
 常用命令：`docker compose down` 停止；`docker compose logs -f app` / `make logs-nginx` 查看日志。若需在宿主机本机调试直连后端，可将 `deploy/docker-compose.override.example.yml` 复制为 `docker-compose.override.yml` 以额外映射 `127.0.0.1:8001`。
 
+**旧服务器（Python 2.7、`docker-compose` 1.x）**：仓库内 `docker-compose.yml` 已使用 **Compose file 2.1**，避免使用 v3 字段。若仍报错，可复制 `deploy/docker-compose.no-healthcheck.yml` 覆盖 `docker-compose.yml`（去掉 healthcheck），或升级 Docker / 安装 `docker compose` V2 插件。
+
 ## 3. 推荐调用顺序
 
 ### 3.1 运行 PDF 解析管道
