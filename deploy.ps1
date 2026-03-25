@@ -27,4 +27,4 @@ Write-Host "[deploy] 完成。" -ForegroundColor Green
 Write-Host "  http://<服务器IP>/          页面与 API"
 Write-Host "  http://<服务器IP>/docs      Swagger"
 Write-Host "  日志: docker compose logs -f app"
-Write-Host "  Nginx: docker compose logs -f nginx"
+Write-Host "  Nginx: docker compose logs -f gateway"

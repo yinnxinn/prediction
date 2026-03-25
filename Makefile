@@ -12,4 +12,4 @@ logs:
 	docker compose logs -f app
 
 logs-nginx:
-	docker compose logs -f nginx
+	docker compose logs -f gateway
