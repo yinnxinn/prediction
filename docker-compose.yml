@@ -9,6 +9,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # 国内网络访问 PyPI 易超时，构建时用清华镜像；海外可改为 https://pypi.org/simple
+        PIP_INDEX_URL: https://pypi.tuna.tsinghua.edu.cn/simple
     image: pridection-price:latest
     container_name: pridection-price-app
     expose:

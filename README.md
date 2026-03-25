@@ -80,6 +80,8 @@ npm run dev
 
 **旧服务器（Python 2.7、`docker-compose` 1.x）**：仓库内 `docker-compose.yml` 已使用 **Compose file 2.1**，避免使用 v3 字段。若仍报错，可复制 `deploy/docker-compose.no-healthcheck.yml` 覆盖 `docker-compose.yml`（去掉 healthcheck），或升级 Docker / 安装 `docker compose` V2 插件。
 
+**Docker 构建时 pip 超时 / `No matching distribution`**：已在 `Dockerfile` 中提高 pip 超时与重试、固定 `requirements.txt` 版本；`docker-compose` 构建参数默认使用 **清华 PyPI 镜像**。海外环境可将 `docker-compose.yml` 里 `PIP_INDEX_URL` 改为 `https://pypi.org/simple` 后重建。
+
 ## 3. 推荐调用顺序
 
 ### 3.1 运行 PDF 解析管道
